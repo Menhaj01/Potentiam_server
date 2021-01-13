@@ -13,11 +13,14 @@ router.post("/signin", (req, res, next) => {
         return res.status(400).json({ message: "Invalid credentials" });
       }
 
-      const isValidPassword = bcrypt.compareSync(password, userDocument.password);
+      const isValidPassword = bcrypt.compareSync(
+        password,
+        userDocument.password
+      );
       if (!isValidPassword) {
         return res.status(400).json({ message: "Invalid credentials" });
       }
-      
+
       req.session.currentUser = userDocument._id;
       res.redirect("/api/auth/isLoggedIn");
     })
@@ -25,7 +28,7 @@ router.post("/signin", (req, res, next) => {
 });
 
 router.post("/signup", (req, res, next) => {
-  const { email, password, firstName, lastName } = req.body;
+  const { email, password, pseudo } = req.body;
 
   User.findOne({ email })
     .then((userDocument) => {
@@ -34,7 +37,7 @@ router.post("/signup", (req, res, next) => {
       }
 
       const hashedPassword = bcrypt.hashSync(password, salt);
-      const newUser = { email, lastName, firstName, password: hashedPassword };
+      const newUser = { email, pseudo, password: hashedPassword };
 
       User.create(newUser)
         .then((newUserDocument) => {
@@ -52,7 +55,7 @@ router.get("/isLoggedIn", (req, res, next) => {
     return res.status(401).json({ message: "Unauthorized" });
 
   const id = req.session.currentUser;
-  
+
   User.findById(id)
     .select("-password")
     .then((userDocument) => {
