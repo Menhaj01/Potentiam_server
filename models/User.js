@@ -5,8 +5,8 @@ const userSchema = new Schema({
   pseudo: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  following: Number,
-  followers: Number,
+  following: [String],
+  followers: [String],
   description: String,
   image: {
     type: String,
