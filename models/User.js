@@ -11,9 +11,19 @@ const userSchema = new Schema({
   image: {
     type: String,
     default:
-      "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png ",
+      "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
   },
-  links: [String],
+  //links: ["http://snpachat/foo92"],
+  links: [
+    {
+      url: String,
+      network: {
+        type: String, 
+        enum: ["Snapchat", "Facebook", "Twitter","Reddit"]
+      }
+    }
+  ],
+
   id_category: {
     type: Schema.Types.ObjectId,
     ref: "Category",
