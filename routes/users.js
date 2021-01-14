@@ -14,8 +14,11 @@ router.get("/all", function (req, res, next) {
     });
 });
 
-router.patch("/:id", function (req, res, next) {
-  User.findByIdAndUpdate(req.params.id, req.body, { new: true })
+router.patch("/me", function (req, res, next) {
+  if (!req.session.currentUser)
+    return res.status(401).json("You have to sign In");
+
+  User.findByIdAndUpdate(req.session.currentUser, req.body, { new: true })
     .select("-password")
     .then((respondApi) => {
       res.status(200).send(respondApi);
@@ -26,6 +29,9 @@ router.patch("/:id", function (req, res, next) {
 });
 
 router.get("/:id", function (req, res, next) {
+  if (!ObjectId.isValid(req.params.id))
+    return res.status(400).send("ID unknown : " + req.params.id);
+
   User.findById(req.params.id)
     .select("-password")
     .then((respondApi) => {

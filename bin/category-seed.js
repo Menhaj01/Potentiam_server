@@ -1,12 +1,41 @@
 require("dotenv").config();
+
 const mongoose = require("mongoose");
-const User = require("../models/User");
-const users = [
+const Category = require("../models/Category");
+
+const categories = [
   {
-    name: "",
+    name: "Business",
+  },
+  {
+    name: "Construction",
+  },
+  {
+    name: "Design",
+  },
+  {
+    name: "Fashion design",
+  },
+  {
+    name: "Graphic design",
+  },
+  {
+    name: "Interior design",
+  },
+  {
+    name: "Economics",
+  },
+  {
+    name: "Engineering",
+  },
+  {
+    name: "Entrepreneurship",
+  },
+  {
+    name: "Health care",
   },
 ];
-const items = [{}];
+
 (async () => {
   try {
     const self = await mongoose.connect(process.env.MONGODB_URI, {
@@ -14,8 +43,8 @@ const items = [{}];
       useNewUrlParser: true,
     });
     console.log(`Connection to ${self.connection.name} succesful.`);
-    const createdUsers = await User.create(users);
-    console.log(createdUsers);
+    const createdcategories = await Category.create(categories);
+    console.log(createdcategories);
     self.connection.close();
   } catch (error) {
     console.log(`An error has occured while seeding... ${error}`);
