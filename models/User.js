@@ -18,10 +18,10 @@ const userSchema = new Schema({
     {
       url: String,
       network: {
-        type: String, 
-        enum: ["Snapchat", "Facebook", "Twitter","Reddit"]
-      }
-    }
+        type: String,
+        enum: ["Snapchat", "Facebook", "Twitter", "Youtube", "Instagram"],
+      },
+    },
   ],
 
   id_category: {

@@ -20,6 +20,7 @@ router.patch("/me", function (req, res, next) {
 
   User.findByIdAndUpdate(req.session.currentUser, req.body, { new: true })
     .select("-password")
+    .populate("id_category")
     .then((respondApi) => {
       res.status(200).send(respondApi);
     })
