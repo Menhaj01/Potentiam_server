@@ -2,6 +2,8 @@ const express = require("express");
 const User = require("../models/User");
 const router = express.Router();
 const ObjectId = require("mongoose").Types.ObjectId;
+const upload = require("../config/cloudinary");
+const requireAuth = require("../middlewares/requireAuth");
 
 router.get("/all", function (req, res, next) {
   User.find()
@@ -39,21 +41,30 @@ router.get("/all/byCategory", function (req, res, next) {
     });
 });
 
-router.patch("/me", function (req, res, next) {
-  if (!req.session.currentUser)
-    return res.status(401).json("You have to sign In");
-  console.log(req.body);
-  console.log(req.session.currentUser);
+router.patch(
+  "/me",
+  requireAuth,
+  upload.single("image"),
+  function (req, res, next) {
+    if (!req.session.currentUser)
+      return res.status(401).json("You have to sign In");
+    // console.log(req.body);
+    // console.log(req.session.currentUser);
+    if (req.file) {
+      req.body.image = req.file.path; // Add profileImage key to req.body
+    }
 
-  User.findByIdAndUpdate(req.session.currentUser, req.body, { new: true })
-    .select("-password")
-    .then((respondApi) => {
-      res.status(200).send(respondApi);
-    })
-    .catch((error) => {
-      console.log(error);
-    });
-});
+    User.findByIdAndUpdate(req.session.currentUser, req.body, { new: true })
+      .select("-password")
+      .then((respondApi) => {
+        res.status(200).send(respondApi);
+        console.log(respondApi);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  }
+);
 
 router.get("/:id", function (req, res, next) {
   if (!ObjectId.isValid(req.params.id))
