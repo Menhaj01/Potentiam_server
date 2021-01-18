@@ -14,13 +14,25 @@ router.get("/all", function (req, res, next) {
     });
 });
 
+router.get("/all/byCategory", function (req, res, next) {
+  User.find({ id_category: { $eq: id_category } })
+    .select("-password")
+    .then((respondApi) => {
+      res.status(200).send(respondApi);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
 router.patch("/me", function (req, res, next) {
   if (!req.session.currentUser)
     return res.status(401).json("You have to sign In");
+  console.log(req.body);
+  console.log(req.session.currentUser);
 
   User.findByIdAndUpdate(req.session.currentUser, req.body, { new: true })
     .select("-password")
-    .populate("id_category")
     .then((respondApi) => {
       res.status(200).send(respondApi);
     })
