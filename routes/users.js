@@ -14,7 +14,19 @@ router.get("/all", function (req, res, next) {
     });
 });
 
+router.get("/me", function (req, res, next) {
+  User.find({ _id: { $eq: req.session.currentUser } })
+    .select("-password")
+    .then((respondApi) => {
+      res.status(200).send(respondApi);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
 router.get("/all/byCategory", function (req, res, next) {
+  console.log(req.query);
   User.find({ id_category: { $eq: id_category } })
     .select("-password")
     .then((respondApi) => {
