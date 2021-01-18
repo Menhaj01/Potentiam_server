@@ -26,10 +26,12 @@ router.get("/me", function (req, res, next) {
 });
 
 router.get("/all/byCategory", function (req, res, next) {
-  console.log(req.query);
-  User.find({ id_category: { $eq: id_category } })
+  // console.log(req.query.id_category);
+  User.find({ id_category: { $eq: req.query.id_category } })
+    // User.find({ id_category: { $eq: id_category } })
     .select("-password")
     .then((respondApi) => {
+      // console.log(respondApi);
       res.status(200).send(respondApi);
     })
     .catch((error) => {
