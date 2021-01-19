@@ -33,7 +33,6 @@ router.get("/all/byCategory", function (req, res, next) {
     // User.find({ id_category: { $eq: id_category } })
     .select("-password -email")
     .then((respondApi) => {
-      // console.log(respondApi);
       res.status(200).send(respondApi);
     })
     .catch((error) => {
@@ -48,8 +47,6 @@ router.patch(
   function (req, res, next) {
     if (!req.session.currentUser)
       return res.status(401).json("You have to sign In");
-    // console.log(req.body);
-    // console.log(req.session.currentUser);
     if (req.file) {
       req.body.image = req.file.path; // Add profileImage key to req.body
     }
