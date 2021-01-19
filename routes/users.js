@@ -7,7 +7,7 @@ const requireAuth = require("../middlewares/requireAuth");
 
 router.get("/all", function (req, res, next) {
   User.find()
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {
       res.status(200).send(respondApi);
     })
@@ -18,7 +18,7 @@ router.get("/all", function (req, res, next) {
 
 router.get("/me", function (req, res, next) {
   User.find({ _id: { $eq: req.session.currentUser } })
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {
       res.status(200).send(respondApi);
     })
@@ -31,7 +31,7 @@ router.get("/all/byCategory", function (req, res, next) {
   // console.log(req.query.id_category);
   User.find({ id_category: { $eq: req.query.id_category } })
     // User.find({ id_category: { $eq: id_category } })
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {
       // console.log(respondApi);
       res.status(200).send(respondApi);
@@ -55,7 +55,7 @@ router.patch(
     }
 
     User.findByIdAndUpdate(req.session.currentUser, req.body, { new: true })
-      .select("-password")
+      .select("-password -email")
       .then((respondApi) => {
         res.status(200).send(respondApi);
         console.log(respondApi);
@@ -69,9 +69,9 @@ router.patch(
 router.get("/:id", function (req, res, next) {
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
-
+  // console.log(req.query.id);
   User.findById(req.params.id)
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {
       res.status(200).send(respondApi);
     })
@@ -107,7 +107,7 @@ router.patch("/follow/:id", function (req, res, next) {
     { $addToSet: { following: req.body.idToFollow } },
     { new: true }
   )
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {
       res.status(200).send(respondApi);
     })
@@ -121,7 +121,7 @@ router.patch("/follow/:id", function (req, res, next) {
     { $addToSet: { followers: req.params.id } },
     { new: true }
   )
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {})
     .catch((error) => {
       return res.status(500).json(error);
@@ -141,7 +141,7 @@ router.patch("/unfollow/:id", function (req, res, next) {
     { $pull: { following: req.body.idToUnfollow } },
     { new: true }
   )
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {
       res.status(200).send(respondApi);
     })
@@ -155,7 +155,7 @@ router.patch("/unfollow/:id", function (req, res, next) {
     { $pull: { followers: req.params.id } },
     { new: true }
   )
-    .select("-password")
+    .select("-password -email")
     .then((respondApi) => {})
     .catch((error) => {
       return res.status(500).json(error);
