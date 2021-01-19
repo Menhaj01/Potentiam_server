@@ -17,7 +17,7 @@ router.get("/all", function (req, res, next) {
 });
 
 router.get("/me", function (req, res, next) {
-  User.find({ _id: { $eq: req.session.currentUser } })
+  User.findOne({ _id: { $eq: req.session.currentUser } })
     .select("-password -email")
     .then((respondApi) => {
       res.status(200).send(respondApi);
@@ -96,15 +96,18 @@ router.delete("/:id", function (req, res, next) {
 
 router.patch("/follow/:id", function (req, res, next) {
   // If the Id is valid
+  console.log(req.params.id);
+  console.log(req.body._id);
   if (!ObjectId.isValid(req.params.id))
-    return res.status(400).send("ID unknown : " + req.params.id);
-  if (!ObjectId.isValid(req.body.idToFollow))
-    return res.status(400).send("ID unknown : " + req.body.idToFollow);
-
+    return res.status(400).send("ID User connected unknown : " + req.params.id);
+  if (!ObjectId.isValid(req.body._id))
+    return res.status(400).send("ID User to follow unknown : " + req.body._id);
+  if (req.params.id === req.body._id)
+    return res.status(400).send("You can NOT follow YOU!!!");
   //Add to follower list
   User.findByIdAndUpdate(
     req.params.id,
-    { $addToSet: { following: req.body.idToFollow } },
+    { $addToSet: { following: req.body._id } },
     { new: true }
   )
     .select("-password -email")
@@ -117,7 +120,7 @@ router.patch("/follow/:id", function (req, res, next) {
 
   //add to following list
   User.findByIdAndUpdate(
-    req.body.idToFollow,
+    req.body._id,
     { $addToSet: { followers: req.params.id } },
     { new: true }
   )
@@ -132,13 +135,13 @@ router.patch("/unfollow/:id", function (req, res, next) {
   // If the Id is valid
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
-  if (!ObjectId.isValid(req.body.idToUnfollow))
-    return res.status(400).send("ID unknown : " + req.body.idToUnfollow);
+  if (!ObjectId.isValid(req.body._id))
+    return res.status(400).send("ID unknown : " + req.body._id);
 
   //remove to follower list
   User.findByIdAndUpdate(
     req.params.id,
-    { $pull: { following: req.body.idToUnfollow } },
+    { $pull: { following: req.body._id } },
     { new: true }
   )
     .select("-password -email")
@@ -151,7 +154,7 @@ router.patch("/unfollow/:id", function (req, res, next) {
 
   //remove to following list
   User.findByIdAndUpdate(
-    req.body.idToUnfollow,
+    req.body._id,
     { $pull: { followers: req.params.id } },
     { new: true }
   )
