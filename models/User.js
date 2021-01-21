@@ -7,6 +7,7 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   following: [String],
   followers: [String],
+  followingToShow: [String],
   description: String,
   image: {
     type: String,
