@@ -19,9 +19,11 @@ router.get("/all", function (req, res, next) {
 router.get("/trends", function (req, res, next) {
   const sort = {
     followers: -1,
-    pseudo : 1,
-  }
-  User.find().sort(sort).limit(3)
+    pseudo: 1,
+  };
+  User.find()
+    .sort(sort)
+    .limit(3)
     .select("-password -email")
     .then((respondApi) => {
       res.status(200).send(respondApi);
@@ -120,9 +122,13 @@ router.get("/:id", function (req, res, next) {
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
   // console.log(req.query.id);
-  User.findById(req.params.id)
+  User.findById(req.params.id).populate({
+    path:     'followingToShow',			
+    populate: { path:  'id_category', model: 'Category' }
+    })
     .select("-password -email")
     .then((respondApi) => {
+      
       res.status(200).send(respondApi);
     })
     .catch((error) => {
@@ -169,7 +175,7 @@ router.patch("/follow/:id", function (req, res, next) {
 
   Promise.all([updateLoggedUser, updateSelectedUser])
     .then(([response1, response2]) => {
-      res.status(200).json({ loggedUser: response1, otherUser: response2 });
+      res.status(200).json(response2);
     })
     .catch((error) => {
       next(error);
@@ -216,20 +222,19 @@ router.patch("/unfollow/:id", function (req, res, next) {
   )
     .select("-password -email")
     .then((respondApi) => {
-      res.status(200).send(respondApi);
+      User.findByIdAndUpdate(
+        req.body._id,
+        { $pull: { followers: req.params.id } },
+        { new: true }
+      )
+        .select("-password -email")
+        .then((respondApi) => {
+          res.status(200).send(respondApi);
+        })
+        .catch((error) => {
+          return res.status(500).json(error);
+        });
     })
-    .catch((error) => {
-      return res.status(500).json(error);
-    });
-
-  //remove to following list
-  User.findByIdAndUpdate(
-    req.body._id,
-    { $pull: { followers: req.params.id } },
-    { new: true }
-  )
-    .select("-password -email")
-    .then((respondApi) => {})
     .catch((error) => {
       return res.status(500).json(error);
     });
