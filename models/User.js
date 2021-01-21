@@ -29,6 +29,7 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Category",
   },
+  nb_like: Number,
 });
 
 const User = mongoose.model("User", userSchema);
