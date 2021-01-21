@@ -68,6 +68,7 @@ app.use((err, req, res, next) => {
       res.sendFile(__dirname + "/public/index.html");
     });
   }
+  console.log("yolo");
   if (process.env.NODE_ENV !== "production") {
     console.error(err);
   }
