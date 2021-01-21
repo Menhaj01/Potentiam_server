@@ -16,6 +16,21 @@ router.get("/all", function (req, res, next) {
     });
 });
 
+router.get("/trends", function (req, res, next) {
+  const sort = {
+    followers: -1,
+    pseudo : 1,
+  }
+  User.find().sort(sort).limit(3)
+    .select("-password -email")
+    .then((respondApi) => {
+      res.status(200).send(respondApi);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
 router.get("/me", function (req, res, next) {
   User.findOne({ _id: { $eq: req.session.currentUser } })
     .select("-password -email")
