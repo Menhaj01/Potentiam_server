@@ -7,6 +7,7 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   following: [String],
   followers: [String],
+  followingToShow: [String],
   description: String,
   image: {
     type: String,
@@ -28,6 +29,7 @@ const userSchema = new Schema({
     type: Schema.Types.ObjectId,
     ref: "Category",
   },
+  nb_like: Number,
 });
 
 const User = mongoose.model("User", userSchema);

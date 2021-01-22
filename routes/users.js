@@ -16,6 +16,23 @@ router.get("/all", function (req, res, next) {
     });
 });
 
+router.get("/trends", function (req, res, next) {
+  const sort = {
+    followers: -1,
+    pseudo: 1,
+  };
+  User.find()
+    .sort(sort)
+    .limit(3)
+    .select("-password -email")
+    .then((respondApi) => {
+      res.status(200).send(respondApi);
+    })
+    .catch((error) => {
+      next(error);
+    });
+});
+
 router.get("/me", function (req, res, next) {
   User.findOne({ _id: { $eq: req.session.currentUser } })
     .select("-password -email")
@@ -63,13 +80,55 @@ router.patch(
   }
 );
 
+router.patch("/me/followingToShow", requireAuth, function (req, res, next) {
+  if (!req.session.currentUser)
+    return res.status(401).json("You have to sign In");
+  // console.log(req.body._id);
+  User.findByIdAndUpdate(
+    req.session.currentUser,
+    { $addToSet: { followingToShow: req.body._id } },
+    { new: true }
+  )
+    .select("-password -email")
+    .then((respondApi) => {
+      res.status(200).send(respondApi);
+      console.log(respondApi);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
+router.patch("/me/followingToUnshow", requireAuth, function (req, res, next) {
+  if (!req.session.currentUser)
+    return res.status(401).json("You have to sign In");
+
+  User.findByIdAndUpdate(
+    req.session.currentUser,
+    { $pull: { followingToShow: req.body._id } },
+    { new: true }
+  )
+    .select("-password -email")
+    .then((respondApi) => {
+      res.status(200).send(respondApi);
+      console.log(respondApi);
+    })
+    .catch((error) => {
+      console.log(error);
+    });
+});
+
 router.get("/:id", function (req, res, next) {
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID unknown : " + req.params.id);
   // console.log(req.query.id);
-  User.findById(req.params.id)
+  User.findById(req.params.id).populate({
+    path:     'followingToShow',			
+    populate: { path:  'id_category', model: 'Category' }
+    })
     .select("-password -email")
     .then((respondApi) => {
+      
       res.status(200).send(respondApi);
     })
     .catch((error) => {
@@ -93,8 +152,8 @@ router.delete("/:id", function (req, res, next) {
 
 router.patch("/follow/:id", function (req, res, next) {
   // If the Id is valid
-  console.log(req.params.id);
-  console.log(req.body._id);
+  // console.log(req.params.id);
+  // console.log(req.body._id);
   if (!ObjectId.isValid(req.params.id))
     return res.status(400).send("ID User connected unknown : " + req.params.id);
   if (!ObjectId.isValid(req.body._id))
@@ -102,30 +161,50 @@ router.patch("/follow/:id", function (req, res, next) {
   if (req.params.id === req.body._id)
     return res.status(400).send("You can NOT follow YOU!!!");
   //Add to follower list
-  User.findByIdAndUpdate(
+
+  const updateLoggedUser = User.findByIdAndUpdate(
     req.params.id,
     { $addToSet: { following: req.body._id } },
     { new: true }
-  )
-    .select("-password -email")
-    .then((respondApi) => {
-      res.status(200).send(respondApi);
-    })
-    .catch((error) => {
-      return res.status(500).json(error);
-    });
-
-  //add to following list
-  User.findByIdAndUpdate(
+  ).select("-password -email");
+  const updateSelectedUser = User.findByIdAndUpdate(
     req.body._id,
     { $addToSet: { followers: req.params.id } },
     { new: true }
-  )
-    .select("-password -email")
-    .then((respondApi) => {})
+  ).select("-password -email");
+
+  Promise.all([updateLoggedUser, updateSelectedUser])
+    .then(([response1, response2]) => {
+      res.status(200).json(response2);
+    })
     .catch((error) => {
-      return res.status(500).json(error);
+      next(error);
     });
+
+  // User.findByIdAndUpdate(
+  //   req.params.id,
+  //   { $addToSet: { following: req.body._id } },
+  //   { new: true }
+  // )
+  //   .select("-password -email")
+  //   .then((respondApi) => {})
+  //   .catch((error) => {
+  //     return res.status(500).json(error);
+  //   });
+
+  // //add to following list
+  // User.findByIdAndUpdate(
+  //   req.body._id,
+  //   { $addToSet: { followers: req.params.id } },
+  //   { new: true }
+  // )
+  //   .select("-password -email")
+  //   .then((respondApi) => {
+  //     res.status(200).send(respondApi);
+  //   })
+  //   .catch((error) => {
+  //     return res.status(500).json(error);
+  //   });
 });
 
 router.patch("/unfollow/:id", function (req, res, next) {
@@ -143,20 +222,19 @@ router.patch("/unfollow/:id", function (req, res, next) {
   )
     .select("-password -email")
     .then((respondApi) => {
-      res.status(200).send(respondApi);
+      User.findByIdAndUpdate(
+        req.body._id,
+        { $pull: { followers: req.params.id } },
+        { new: true }
+      )
+        .select("-password -email")
+        .then((respondApi) => {
+          res.status(200).send(respondApi);
+        })
+        .catch((error) => {
+          return res.status(500).json(error);
+        });
     })
-    .catch((error) => {
-      return res.status(500).json(error);
-    });
-
-  //remove to following list
-  User.findByIdAndUpdate(
-    req.body._id,
-    { $pull: { followers: req.params.id } },
-    { new: true }
-  )
-    .select("-password -email")
-    .then((respondApi) => {})
     .catch((error) => {
       return res.status(500).json(error);
     });
