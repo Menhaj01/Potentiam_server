@@ -12,7 +12,7 @@ const userSchema = new Schema({
   image: {
     type: String,
     default:
-      "https://cdn.business2community.com/wp-content/uploads/2017/08/blank-profile-picture-973460_640.png",
+      "https://res.cloudinary.com/dqwbskuge/image/upload/v1611315933/73b6dd3a54345fdd77e5aeed7e84ead0_t17u8k.jpg",
   },
   //links: ["http://snpachat/foo92"],
   links: [
