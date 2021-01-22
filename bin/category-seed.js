@@ -5,19 +5,43 @@ const Category = require("../models/Category");
 
 const categories = [
   {
-    name: "Business",
+    name: "Beauty",
   },
   {
-    name: "Construction",
+    name: "Chinese cuisine",
   },
   {
-    name: "Design",
+    name: "Comics",
   },
   {
     name: "Fashion design",
   },
   {
-    name: "Graphic design",
+    name: "Food",
+  },
+  {
+    name: "Shopping",
+  },
+  {
+    name: "Marriage",
+  },
+  {
+    name: "Home and garden",
+  },
+  {
+    name: "Hip hop music",
+  },
+  {
+    name: "Hair products",
+  },
+  {
+    name: "Guitar",
+  },
+  {
+    name: "French cuisine",
+  },
+  {
+    name: "Video games",
   },
   {
     name: "Interior design",
@@ -26,13 +50,13 @@ const categories = [
     name: "Economics",
   },
   {
-    name: "Engineering",
+    name: "TV reality shows",
   },
   {
-    name: "Entrepreneurship",
+    name: "Swimming",
   },
   {
-    name: "Health care",
+    name: "Tennis",
   },
 ];
 
